@@ -271,7 +271,7 @@ def send_raw_msg(self, msgType, content, toUserName):
         'Scene': 0, }
     headers = { 'ContentType': 'application/json; charset=UTF-8', 'User-Agent' : config.USER_AGENT }
     r = self.s.post(url, headers=headers,
-        data=json.dumps(data, ensure_ascii=False).encode('utf8'))
+        data=json.dumps(data, ensure_ascii=False).encode('utf8'),verify=False)
     return ReturnValue(rawResponse=r)
 
 def send_msg(self, msg='Test Message', toUserName=None):
@@ -359,7 +359,7 @@ def upload_chunk_file(core, fileDir, fileSymbol, fileSize,
     else:
         files['chunk'], files['chunks'] = (None, str(chunk)), (None, str(chunks))
     headers = { 'User-Agent' : config.USER_AGENT }
-    return requests.post(url, files=files, headers=headers)
+    return requests.post(url, files=files, headers=headers,verify=False)
 
 def send_file(self, fileDir, toUserName=None, mediaId=None, file_=None):
     logger.debug('Request to send a file(mediaId: %s) to %s: %s' % (
@@ -398,7 +398,7 @@ def send_file(self, fileDir, toUserName=None, mediaId=None, file_=None):
         'User-Agent': config.USER_AGENT,
         'Content-Type': 'application/json;charset=UTF-8', }
     r = self.s.post(url, headers=headers,
-        data=json.dumps(data, ensure_ascii=False).encode('utf8'))
+        data=json.dumps(data, ensure_ascii=False,verify=False).encode('utf8'))
     return ReturnValue(rawResponse=r)
 
 def send_image(self, fileDir=None, toUserName=None, mediaId=None, file_=None):
@@ -479,7 +479,7 @@ def send_video(self, fileDir=None, toUserName=None, mediaId=None, file_=None):
         'User-Agent' : config.USER_AGENT,
         'Content-Type': 'application/json;charset=UTF-8', }
     r = self.s.post(url, headers=headers,
-        data=json.dumps(data, ensure_ascii=False).encode('utf8'))
+        data=json.dumps(data, ensure_ascii=False,verify=False).encode('utf8'))
     return ReturnValue(rawResponse=r)
 
 def send(self, msg, toUserName=None, mediaId=None):
@@ -519,5 +519,5 @@ def revoke(self, msgId, toUserName, localId=None):
         'ContentType': 'application/json; charset=UTF-8', 
         'User-Agent' : config.USER_AGENT }
     r = self.s.post(url, headers=headers,
-        data=json.dumps(data, ensure_ascii=False).encode('utf8'))
+        data=json.dumps(data, ensure_ascii=False,verify=False).encode('utf8'))
     return ReturnValue(rawResponse=r)

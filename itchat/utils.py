@@ -122,7 +122,7 @@ def print_line(msg, oneLine = False):
 def test_connect(retryTime=5):
     for i in range(retryTime):
         try:
-            r = requests.get(config.BASE_URL)
+            r = requests.get(config.BASE_URL, verify=False)
             return True
         except:
             if i == retryTime - 1:

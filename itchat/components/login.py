@@ -87,7 +87,7 @@ def push_login(core):
         url = '%s/cgi-bin/mmwebwx-bin/webwxpushloginurl?uin=%s' % (
             config.BASE_URL, cookiesDict['wxuin'])
         headers = { 'User-Agent' : config.USER_AGENT }
-        r = core.s.get(url, headers=headers).json()
+        r = core.s.get(url, headers=headers,verify=False).json()
         if 'uuid' in r and r.get('ret') in (0, '0'):
             core.uuid = r['uuid']
             return r['uuid']
@@ -99,7 +99,7 @@ def get_QRuuid(self):
         'appid' : 'wx782c26e4c19acffb',
         'fun'   : 'new', }
     headers = { 'User-Agent' : config.USER_AGENT }
-    r = self.s.get(url, params=params, headers=headers)
+    r = self.s.get(url, params=params, headers=headers, verify=False)
     regx = r'window.QRLogin.code = (\d+); window.QRLogin.uuid = "(\S+?)";'
     data = re.search(regx, r.text)
     if data and data.group(1) == '200':
@@ -130,7 +130,7 @@ def check_login(self, uuid=None):
     params = 'loginicon=true&uuid=%s&tip=0&r=%s&_=%s' % (
         uuid, localTime / 1579, localTime)
     headers = { 'User-Agent' : config.USER_AGENT }
-    r = self.s.get(url, params=params, headers=headers)
+    r = self.s.get(url, params=params, headers=headers, verify=False)
     regx = r'window.code=(\d+)'
     data = re.search(regx, r.text)
     if data and data.group(1) == '200':
@@ -152,7 +152,7 @@ def process_login_info(core, loginContent):
     regx = r'window.redirect_uri="(\S+)";'
     core.loginInfo['url'] = re.search(regx, loginContent).group(1)
     headers = { 'User-Agent' : config.USER_AGENT }
-    r = core.s.get(core.loginInfo['url'], headers=headers, allow_redirects=False)
+    r = core.s.get(core.loginInfo['url'], headers=headers, allow_redirects=False,verify=False)
     core.loginInfo['url'] = core.loginInfo['url'][:core.loginInfo['url'].rfind('/')]
     for indexUrl, detailedUrl in (
             ("wx2.qq.com"      , ("file.wx2.qq.com", "webpush.wx2.qq.com")),
@@ -190,7 +190,7 @@ def web_init(self):
     headers = {
         'ContentType': 'application/json; charset=UTF-8',
         'User-Agent' : config.USER_AGENT, }
-    r = self.s.post(url, data=json.dumps(data), headers=headers)
+    r = self.s.post(url, data=json.dumps(data), headers=headers, verify=False)
     dic = json.loads(r.content.decode('utf-8', 'replace'))
     # deal with login info
     utils.emoji_formatter(dic['User'], 'NickName')
@@ -232,7 +232,7 @@ def show_mobile_login(self):
     headers = {
         'ContentType': 'application/json; charset=UTF-8',
         'User-Agent' : config.USER_AGENT, }
-    r = self.s.post(url, data=json.dumps(data), headers=headers)
+    r = self.s.post(url, data=json.dumps(data), headers=headers, verify=False)
     return ReturnValue(rawResponse=r)
 
 def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
@@ -297,7 +297,7 @@ def sync_check(self):
         '_'        : int(time.time() * 1000),}
     headers = { 'User-Agent' : config.USER_AGENT }
     try:
-        r = self.s.get(url, params=params, headers=headers, timeout=config.TIMEOUT)
+        r = self.s.get(url, params=params, headers=headers, timeout=config.TIMEOUT, verify=False)
     except requests.exceptions.ConnectionError as e:
         try:
             if not isinstance(e.args[0].args[1], BadStatusLine):
@@ -328,7 +328,7 @@ def get_msg(self):
     headers = {
         'ContentType': 'application/json; charset=UTF-8',
         'User-Agent' : config.USER_AGENT }
-    r = self.s.post(url, data=json.dumps(data), headers=headers, timeout=config.TIMEOUT)
+    r = self.s.post(url, data=json.dumps(data), headers=headers, timeout=config.TIMEOUT, verify=False)
     dic = json.loads(r.content.decode('utf-8', 'replace'))
     if dic['BaseResponse']['Ret'] != 0: return None, None
     self.loginInfo['SyncKey'] = dic['SyncCheckKey']
@@ -344,7 +344,7 @@ def logout(self):
             'type'     : 1,
             'skey'     : self.loginInfo['skey'], }
         headers = { 'User-Agent' : config.USER_AGENT }
-        self.s.get(url, params=params, headers=headers)
+        self.s.get(url, params=params, headers=headers, verify=False)
         self.alive = False
     self.isLogging = False
     self.s.cookies.clear()
